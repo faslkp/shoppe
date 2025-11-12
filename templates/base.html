@@ -35,15 +35,18 @@
                     </li>
                     {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'users:profile' %}">{{ user.get_full_name|default:user.username }}</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link" href="{% url 'users:cart' %}">
                                 Cart
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'orders:list' %}">Orders</a>
+                            <a class="nav-link" href="">Orders</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" disabled>|</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'users:profile' %}">{{ user.get_full_name|default:user.username }}</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'users:logout' %}">Logout</a>

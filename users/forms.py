@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import get_user_model
 
 from users.models import Address
@@ -29,9 +29,17 @@ class UserRegistrationForm(UserCreationForm):
                 field.widget.attrs['placeholder'] = placeholders[field_name]
 
 
-class UserLoginForm(forms.Form):
-    username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Username'}))
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Password'}))
+class UserLoginForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].label = 'Email'
+        self.fields['username'].widget.attrs['placeholder'] = 'Email Address'
+        self.fields['password'].widget.attrs['placeholder'] = 'Password'
+        for field_name, field in self.fields.items():
+            field.help_text = ''
+            existing_classes = field.widget.attrs.get('class', '')
+            field.widget.attrs['class'] = (existing_classes + ' form-control').strip()
+
 
 
 class AddressForm(forms.ModelForm):

@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Your Cart | Shoppe{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Your Cart</h2>
+    {% if cart_items %}
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Product</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col">Unit Price</th>
+                        <th scope="col">Subtotal</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart_items %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'shop:product_detail' item.product.id %}">
+                                {% if item.product.image %}
+                                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" style="width: 50px; height: 50px; object-fit: cover;" class="me-2 rounded">
+                                {% endif %}
+                                {{ item.product.name }}
+                            </a>
+                        </td>
+                        <td class="d-flex align-items-center gap-2">
+                            <form method="post" action="{% url 'users:decrease_cart_quantity' item.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-secondary py-0 px-2" title="Decrease Quantity" {% if item.quantity <= 1 %}disabled{% endif %}>
+                                    -
+                                </button>
+                                <input type="hidden" name="decrement" value="1">
+                            </form>
+                            <span style="min-width:2rem;text-align:center;">{{ item.quantity }}</span>
+                            <form method="post" action="{% url 'users:increase_cart_quantity' item.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-secondary py-0 px-2" title="Increase Quantity">
+                                    +
+                                </button>
+                                <input type="hidden" name="increment" value="1">
+                            </form>
+                        </td>
+                        <td>₹{{ item.product.price }}</td>
+                        <td>₹{{ item.subtotal }}</td>
+                        <td>
+                            <form method="post" action="{% url 'users:remove_from_cart' item.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-danger" title="Remove from cart">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot class="table-light">
+                    <tr>
+                        <th colspan="3" class="text-end">Total:</th>
+                        <th>₹{{ total }}</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <a href="#" class="btn btn-success mt-3 disabled">Checkout (Not Implemented)</a>
+    {% else %}
+        <div class="alert alert-info">
+            Your cart is empty.
+        </div>
+        <a href="{% url 'shop:product_list' %}" class="btn btn-primary mt-3">Continue Shopping</a>
+    {% endif %}
+</div>
+{% endblock %}

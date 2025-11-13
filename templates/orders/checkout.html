@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout | Shoppe{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="mb-4">Checkout</h2>
+        <form method="post" action="" class="row g-4">
+            {% csrf_token %}
+
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body">
+                        <h4 class="mb-3">Shipping Address</h4>
+                        
+                        {% if addresses %}
+                            <div class="mb-4">
+                                <label class="form-label mb-2">Select shipping address:</label>
+                                <div class="list-group mb-2">
+                                    {% for address in addresses %}
+                                        <label class="list-group-item list-group-item-action d-flex align-items-center" style="cursor:pointer;">
+                                            <input class="form-check-input me-2" type="radio" name="selected_address" value="{{ address.id }}" {% if address.is_default %}checked{% endif %} data-address-type="existing">
+                                            <div>
+                                                <span>{{ address.address_line_1 }}</span>
+                                                {% if address.address_line_2 %}
+                                                    <span>{{ address.address_line_2 }}</span>
+                                                {% endif %}
+                                                <br><span>{{ address.city }}, {{ address.state }}</span><br>
+                                                <span>{{ address.country }}, {{ address.zip_code }}</span>
+                                                {% if address.is_default %}
+                                                    <span class="badge bg-primary ms-2">Default</span>
+                                                {% endif %}
+                                            </div>
+                                        </label>
+                                    {% endfor %}
+                                    <label class="list-group-item list-group-item-action d-flex align-items-center" style="cursor:pointer;">
+                                        <input class="form-check-input me-2" type="radio" name="selected_address" value="new" id="newAddressRadio" data-address-type="new">
+                                        <div>
+                                            <strong>Add New Address</strong>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info mb-2 p-2">No saved addresses found. Please add a new shipping address below.</div>
+                        {% endif %}
+
+                        <div id="newAddressForm" {% if addresses %} style="display:none;" {% endif %}>
+                            <div class="mb-3">
+                                <label for="address_line1" class="form-label">Address Line 1</label>
+                                <input type="text" class="form-control" id="address_line_1" name="address_line_1" {% if not addresses %}required{% endif %}>
+                            </div>
+                            <div class="mb-3">
+                                <label for="address_line2" class="form-label">Address Line 2</label>
+                                <input type="text" class="form-control" id="address_line_2" name="address_line_2">
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-6">
+                                    <label for="city" class="form-label">City</label>
+                                    <input type="text" class="form-control" id="city" name="city" {% if not addresses %}required{% endif %}>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label for="state" class="form-label">State</label>
+                                    <input type="text" class="form-control" id="state" name="state" {% if not addresses %}required{% endif %}>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-6">
+                                    <label for="zip_code" class="form-label">Zip Code</label>
+                                    <input type="text" class="form-control" id="zip_code" name="zip_code" {% if not addresses %}required{% endif %}>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label for="country" class="form-label">Country</label>
+                                    <input type="text" class="form-control" id="country" name="country" {% if not addresses %}required{% endif %}>
+                                </div>
+                            </div>
+
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="save_address" name="save_address" checked>
+                                <label class="form-check-label" for="save_address">
+                                    Save this address to my account
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    var newAddressForm = document.getElementById("newAddressForm");
+                    var addressRadios = document.querySelectorAll('input[name="selected_address"]');
+                    var requiredFields = ['address_line_1', 'city', 'state', 'zip_code', 'country'];
+                    
+                    function toggleRequiredFields(isRequired) {
+                        requiredFields.forEach(function(fieldId) {
+                            var field = document.getElementById(fieldId);
+                            if (field) {
+                                if (isRequired) {
+                                    field.setAttribute('required', 'required');
+                                } else {
+                                    field.removeAttribute('required');
+                                }
+                            }
+                        });
+                    }
+                    
+                    if (addressRadios.length > 0 && newAddressForm) {
+                        addressRadios.forEach(function(radio) {
+                            radio.addEventListener("change", function() {
+                                if (this.value === "new" || this.dataset.addressType === "new") {
+                                    newAddressForm.style.display = '';
+                                    toggleRequiredFields(true);
+                                } else {
+                                    newAddressForm.style.display = 'none';
+                                    toggleRequiredFields(false);
+                                }
+                            });
+                        });
+                        
+                        var checkedRadio = document.querySelector('input[name="selected_address"]:checked');
+                        if (checkedRadio && checkedRadio.value === "new") {
+                            newAddressForm.style.display = '';
+                            toggleRequiredFields(true);
+                        } else if (checkedRadio && checkedRadio.value !== "new") {
+                            toggleRequiredFields(false);
+                        }
+                    } else if (!addressRadios.length && newAddressForm) {
+                        toggleRequiredFields(true);
+                    }
+                });
+            </script>
+            
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body">
+                        <h4 class="mb-3">Order Summary</h4>
+                        <div class="table-responsive mb-3">
+                            <table class="table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th class="text-center">Qty</th>
+                                        <th class="text-end">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if cart_items %}
+                                        {% for item in cart_items %}
+                                        <tr>
+                                            <td>
+                                                {{ item.product.name }}
+                                            </td>
+                                            <td class="text-center">{{ item.quantity }}</td>
+                                            <td class="text-end">₹{{ item.subtotal }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="3" class="text-center text-muted">Your cart is empty.</td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th colspan="2" class="text-end">Total:</th>
+                                        <th class="text-end">₹{{ total }}</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <h5 class="mb-3">Payment Method</h5>
+                        <div>
+                            {% csrf_token %}
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="payment_method" id="payment_cod" value="cod" checked>
+                                <label class="form-check-label" for="payment_cod">
+                                    Cash on Delivery
+                                </label>
+                            </div>
+                            <!-- <div class="form-check mb-3">
+                                <input class="form-check-input" type="radio" name="payment_method" id="payment_card" value="card">
+                                <label class="form-check-label" for="payment_card">
+                                    Credit/Debit Card <span class="text-muted">(Not available)</span>
+                                </label>
+                            </div> -->
+                            <div class="d-flex justify-content-end gap-2">
+                                <a href="{% url 'users:cart' %}" class="btn btn-outline-secondary">Cancel</a>
+                                <button type="submit" class="btn btn-success">Place Order</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+</div>
+{% endblock %}

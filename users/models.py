@@ -1,3 +1,4 @@
+from ast import mod
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
@@ -39,7 +40,9 @@ class Address(models.Model):
     class Meta:
         verbose_name = 'Address'
         verbose_name_plural = 'Addresses'
-        unique_together = ['user', 'is_default']
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'is_default'], condition=models.Q(is_default=True), name='unique_default_address')
+        ]
 
 
 class Cart(models.Model):

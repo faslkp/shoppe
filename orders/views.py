@@ -1,13 +1,14 @@
 from django.shortcuts import render
 from users.models import Address
 from users.models import CartItem
-from django.db.models import Sum, F
+from django.db.models import Sum, F, Subquery, OuterRef
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.db import transaction
 
 from users.forms import AddressForm
 from orders.models import Order, OrderItem
+from shop.models import ProductRating
 
 
 def checkout_view(request):
@@ -84,7 +85,17 @@ def orders_view(request):
 
 def order_detail_view(request, order_id):
     order = Order.objects.get(id=order_id)
-    order_items = OrderItem.objects.filter(order=order).prefetch_related('product').order_by('product__name').annotate(subtotal=F('quantity') * F('product__price'))
+    user_rating_subquery = Subquery(
+        ProductRating.objects.filter(
+            product=OuterRef('product'),
+            user=request.user
+        ).values('rating')[:1]
+    )
+    order_items = OrderItem.objects.filter(order=order).prefetch_related(
+        'product', 'product__ratings').order_by('product__name').annotate(
+                subtotal=F('quantity') * F('product__price'),
+                user_rating=user_rating_subquery
+            )
     context = {
         'order': order,
         'order_items': order_items

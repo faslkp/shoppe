@@ -25,9 +25,9 @@
             {% endif %}
             <div>
                 <strong>Rating:</strong>
-                {{ product.ratings.aggregate_avg_rating|default:0|floatformat:1 }} / 5
+                {{ avg_rating|default:0|floatformat:1 }} / 5
                 <span class="text-warning">&#9733;</span>
-                <span>({{ product.ratings.count }} review{{ product.ratings.count|pluralize }})</span>
+                <span>({{ count_rating }} review{{ count_rating|pluralize }})</span>
             </div>
             {% if product.stock > 0 %}
             <form method="post" action="{% url 'shop:add_to_cart' product.id %}">

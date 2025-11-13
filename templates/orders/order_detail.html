@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h2>Order #{{ order.id }}</h2>
-  <div class="card mb-4">
+<h2>Order #{{ order.id }}</h2>
+<div class="card mb-4">
     <div class="card-body">
-      <strong>Status:</strong>
-      <span class="badge 
+        <strong>Status:</strong>
+        <span class="badge 
         {% if order.status == 'pending' %} bg-secondary
         {% elif order.status == 'processing' %} bg-info
         {% elif order.status == 'shipped' %} bg-primary
@@ -14,58 +14,129 @@
         {% else %} bg-light text-dark
         {% endif %}
       ">
-        {{ order.get_status_display }}
-      </span>
-      <br>
-      <strong>Placed on:</strong> {{ order.created_at|date:"M d, Y H:i" }}
-      <br>
-      <strong>Shipping Address:</strong>
-      <div class="ms-3">
-        {{ order.address.address_line_1 }}<br>
-        {% if order.address.address_line_2 %}
-          {{ order.address.address_line_2 }}<br>
-        {% endif %}
-        {{ order.address.city }}, {{ order.address.state }} {{ order.address.zip_code }}<br>
-        {{ order.address.country }}
-      </div>
+            {{ order.get_status_display }}
+        </span>
+        <br>
+        <strong>Placed on:</strong> {{ order.created_at|date:"M d, Y H:i" }}
+        <br>
+        <strong>Shipping Address:</strong>
+        <div class="ms-3">
+            {{ order.address.address_line_1 }}<br>
+            {% if order.address.address_line_2 %}
+            {{ order.address.address_line_2 }}<br>
+            {% endif %}
+            {{ order.address.city }}, {{ order.address.state }} {{ order.address.zip_code }}<br>
+            {{ order.address.country }}
+        </div>
     </div>
-  </div>
+</div>
 
-  <h4 class="mb-3">Order Items</h4>
-  <div class="table-responsive">
+<h4 class="mb-3">Order Items</h4>
+<div class="table-responsive">
     <table class="table align-middle">
-      <thead>
-        <tr>
-          <th>Product</th>
-          <th>Unit Price</th>
-          <th>Quantity</th>
-          <th>Subtotal</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for item in order_items %}
-        <tr>
-          <td>
-            {{ item.product.name }}
-          </td>
-          <td>
-            {{ item.price }}
-          </td>
-          <td>
-            {{ item.quantity }}
-          </td>
-          <td>
-            {{ item.subtotal }}
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-      <tfoot>
-        <tr>
-          <td colspan="3" class="text-end"><strong>Total Amount:</strong></td>
-          <td><strong>{{ order.total_amount }}</strong></td>
-        </tr>
-      </tfoot>
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Unit Price</th>
+                <th>Quantity</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order_items %}
+            <tr>
+                <td>
+                    {{ item.product.name }}
+                </td>
+                <td>
+                    {{ item.price }}
+                </td>
+                <td>
+                    {{ item.quantity }}
+                </td>
+                <td>
+                    {{ item.subtotal }}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4">
+                    <form method="post" action="{% url 'shop:rate_product' item.product.id %}">
+                        {% csrf_token %}
+                        <div class="d-flex align-items-center mb-2">
+                            <label class="me-2 mb-0"><small>{% if item.user_rating %}Your Rating:{% else %}Add Rating:{% endif %}</small></label>
+                            <div class="star-rating" data-product="{{ item.product.id }}" data-rating="{{ item.user_rating|default:0 }}">
+                                {% for i in "12345" %}
+                                <button type="submit" name="rating" value="{{ forloop.counter }}" class="btn p-0 border-0 bg-transparent star-btn" style="font-size:1.3rem; color: {% if item.user_rating and forloop.counter <= item.user_rating %}#ffc107{% else %}#e4e5e9{% endif %};" data-star-index="{{ forloop.counter }}">
+                                    <i class="bi {% if item.user_rating and forloop.counter <= item.user_rating %}bi-star-fill{% else %}bi-star{% endif %}"></i>
+                                </button>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <input type="hidden" name="order_id" value="{{ order.id }}">
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3" class="text-end"><strong>Total Amount:</strong></td>
+                <td><strong>{{ order.total_amount }}</strong></td>
+            </tr>
+        </tfoot>
     </table>
-  </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.star-rating').forEach(function(starContainer) {
+            const stars = starContainer.querySelectorAll('.star-btn');
+            const existingRating = parseInt(starContainer.dataset.rating) || 0;
+            
+            // Initialize stars with existing rating
+            function setInitialRating() {
+                stars.forEach((btn, idx) => {
+                    const starIndex = idx + 1;
+                    const icon = btn.querySelector('i');
+                    if (existingRating > 0 && starIndex <= existingRating) {
+                        icon.classList.remove('bi-star');
+                        icon.classList.add('bi-star-fill');
+                        btn.style.color = '#ffc107';
+                    } else {
+                        icon.classList.remove('bi-star-fill');
+                        icon.classList.add('bi-star');
+                        btn.style.color = '#e4e5e9';
+                    }
+                });
+            }
+            
+            setInitialRating();
+            
+            // Hover effects
+            stars.forEach((btn, idx) => {
+                btn.addEventListener('mouseover', function() {
+                    const hoverIndex = idx + 1;
+                    stars.forEach((star, j) => {
+                        const starIndex = j + 1;
+                        const icon = star.querySelector('i');
+                        if (starIndex <= hoverIndex) {
+                            icon.classList.remove('bi-star');
+                            icon.classList.add('bi-star-fill');
+                            star.style.color = '#ffc107';
+                        } else {
+                            icon.classList.remove('bi-star-fill');
+                            icon.classList.add('bi-star');
+                            star.style.color = '#e4e5e9';
+                        }
+                    });
+                });
+            });
+            
+            // Restore original rating on mouse leave
+            starContainer.addEventListener('mouseleave', function() {
+                setInitialRating();
+            });
+        });
+    });
+</script>
 {% endblock %}

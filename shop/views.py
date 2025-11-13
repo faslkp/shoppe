@@ -1,9 +1,12 @@
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
+from django.db.models import Avg, Count
 
 from shop.models import Product
 from users.models import Cart, CartItem
+from shop.forms import ProductRatingForm
+from shop.models import ProductRating
 
 def index(request):
     return render(request, 'shop/index.html')
@@ -33,9 +36,13 @@ def product_list(request):
 
 
 def product_detail(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
+    product = Product.objects.get(id=product_id)
+    avg_rating = product.ratings.aggregate(Avg('rating'))['rating__avg'] or 0
+    count_rating = product.ratings.count() or 0
     context = {
-        'product': product
+        'product': product,
+        'avg_rating': avg_rating,
+        'count_rating': count_rating
     }
     return render(request, 'shop/product_detail.html', context)
 
@@ -56,4 +63,19 @@ def add_to_cart(request, product_id):
         cart_item.quantity += 1
     cart_item.save()
     messages.success(request, f'{product.name} has been added to your cart.')
+    return redirect('shop:product_detail', product_id=product_id)
+
+
+def rate_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    if request.method == 'POST':
+        order_id = request.POST.get('order_id')
+        rating = request.POST.get('rating')
+        ProductRating.objects.update_or_create(
+                product=product, 
+                user=request.user, 
+                defaults={'rating': rating}
+            )
+        messages.success(request, 'Rating added successfully.')
+        return redirect('orders:order_detail', order_id=order_id)
     return redirect('shop:product_detail', product_id=product_id)

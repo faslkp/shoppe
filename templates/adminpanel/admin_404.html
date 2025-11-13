@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Page Not Found{% endblock %}
+
+{% block content %}
+<div class="container text-center mt-5">
+    <h1 class="display-4 text-danger">404</h1>
+    <h2 class="mb-3">Page Not Found or No Access</h2>
+    <p class="mb-4">
+        Sorry, the page you are looking for does not exist or you do not have permission to access it.
+    </p>
+    <a href="{% url 'shop:index' %}" class="btn btn-primary">
+        Go to Shop
+    </a>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Panel | Shoppe{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav id="sidebarMenu" class="col-md-2 col-lg-2 d-md-block bg-light sidebar collapse min-vh-100" style="min-height: 100vh;">
+            <div class="position-sticky pt-3">
+                <h5 class="sidebar-heading px-3 mb-3 text-muted">Admin Menu</h5>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active fw-bold text-primary bg-white border-start border-4 border-primary{% endif %}" href="{% url 'adminpanel:dashboard' %}">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'orders' %}active fw-bold text-primary bg-white border-start border-4 border-primary{% endif %}" href="{% url 'adminpanel:orders' %}">
+                            <i class="bi bi-receipt"></i> Orders
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'customers' %}active fw-bold text-primary bg-white border-start border-4 border-primary{% endif %}" href="{% url 'adminpanel:customers' %}">
+                            <i class="bi bi-people"></i> Customers
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'products' %}active fw-bold text-primary bg-white border-start border-4 border-primary{% endif %}" href="{% url 'adminpanel:products' %}">
+                            <i class="bi bi-box"></i> Products
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'logout' %}active fw-bold text-primary bg-white border-start border-4 border-primary{% endif %}" href="{% url 'adminpanel:logout' %}">
+                            <i class="bi bi-box-arrow-in-left"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+            {% block admin_content %}
+            <!-- Admin content goes here -->
+            {% endblock %}
+        </main>
+    </div>
+</div>
+{% endblock %}

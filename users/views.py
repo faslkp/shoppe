@@ -81,3 +81,24 @@ def increase_cart_quantity(request, cart_item_id):
         cart_item.save()
         messages.success(request, 'Quantity increased.')
     return redirect('users:cart')
+
+
+def admin_login(request):
+    if request.method == 'POST':
+        form = UserLoginForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            if user.is_staff:
+                login(request, user)
+                return redirect('adminpanel:dashboard')
+            else:
+                messages.error(request, 'You are not authorized to access this page.')
+                return redirect('adminpanel:login')
+    else:
+        form = UserLoginForm(request)
+    return render(request, 'users/login.html', {'form': form})
+
+
+def admin_logout(request):
+    logout(request)
+    return redirect('adminpanel:login')

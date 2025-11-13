@@ -1,0 +1,39 @@
+{% extends 'adminpanel/adminbase.html' %}
+
+{% block title %}Orders | Shoppe Admin{% endblock %}
+
+{% block admin_content %}
+<div class="container px-0">
+    <h3 class="mb-4 text-center">All Orders</h3>
+    <div class="card">
+        <div class="card-body">
+            {% if orders %}
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>{{ order.id }}</td>
+                        <td>{{ order.user.username }}</td>
+                        <td>{{ order.get_status_display }}</td>
+                        <td>{{ order.created_at }}</td>
+                        <td>₹{{ order.total_amount }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="mb-0 text-muted text-center">No orders found.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends 'adminpanel/adminbase.html' %}
+
+{% block title %}Products | Shoppe Admin{% endblock %}
+
+{% block admin_content %}
+<div class="container px-0">
+    <h3 class="mb-4 text-center">Products</h3>
+    <div class="card">
+        <div class="card-body">
+            {% if products %}
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Price (₹)</th>
+                        <th>Stock</th>
+                        <th>Created At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.category.name|default:"-" }}</td>
+                        <td>{{ product.price }}</td>
+                        <td>{{ product.stock }}</td>
+                        <td>{{ product.created_at|date:"Y-m-d H:i" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="mb-0 text-muted text-center">No products found.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

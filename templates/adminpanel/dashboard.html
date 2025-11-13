@@ -1,0 +1,71 @@
+{% extends 'adminpanel/adminbase.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block admin_content %}
+<h3 class="mb-4 text-center">Shoppe Admin Dashboard</h3>
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <div class="card text-white bg-primary h-100 shadow">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                <h5 class="card-title">Total Orders</h5>
+                <h2 class="display-4">{{ total_orders }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card text-white bg-success h-100 shadow">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                <h5 class="card-title">Total Revenue</h5>
+                <h2 class="display-4">₹{{ total_revenue|floatformat:2 }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card text-white bg-info h-100 shadow">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                <h5 class="card-title">Customers</h5>
+                <h2 class="display-4">{{ total_customers }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card text-white bg-warning h-100 shadow">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                <h5 class="card-title">Products</h5>
+                <h2 class="display-4">{{ total_products }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header">
+        <h5>Recent Orders</h5>
+    </div>
+    <div class="card-body">
+        <table class="table mb-0">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in recent_orders %}
+                <tr>
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.user.username }}</td>
+                    <td>{{ order.get_status_display }}</td>
+                    <td>{{ order.created_at }}</td>
+                    <td>₹{{ order.total_amount }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

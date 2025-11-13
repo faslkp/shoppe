@@ -4,10 +4,11 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('users/', include('users.urls', namespace='users')),
+    path('superadmin/', admin.site.urls),
     path('', include('shop.urls', namespace='shop')),
+    path('users/', include('users.urls', namespace='users')),
     path('orders/', include('orders.urls', namespace='orders')),
+    path('admin/', include('adminpanel.urls', namespace='adminpanel')),
 ]
 
 if settings.DEBUG:

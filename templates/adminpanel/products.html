@@ -4,7 +4,10 @@
 
 {% block admin_content %}
 <div class="container px-0">
-    <h3 class="mb-4 text-center">Products</h3>
+    <div class="mb-4 d-flex justify-content-between align-items-center">
+        <h3 class="text-center">Products</h3>
+        <a href="{% url 'adminpanel:product_create' %}" class="btn btn-primary">Add Product</a>
+    </div>
     <div class="card">
         <div class="card-body">
             {% if products %}
@@ -13,10 +16,11 @@
                     <tr>
                         <th>#</th>
                         <th>Name</th>
-                        <th>Category</th>
                         <th>Price (₹)</th>
                         <th>Stock</th>
-                        <th>Created At</th>
+                        <th>Avg Rating</th>
+                        <th>Is Active?</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -24,11 +28,22 @@
                     <tr>
                         <td>{{ forloop.counter }}</td>
                         <td>{{ product.name }}</td>
-                        <td>{{ product.category.name|default:"-" }}</td>
                         <td>{{ product.price }}</td>
                         <td>{{ product.stock }}</td>
-                        <td>{{ product.created_at|date:"Y-m-d H:i" }}</td>
-                    </tr>
+                        <td>{{ product.avg_rating|default:0|floatformat:1 }}</td>
+                        <td>
+                            {% if product.is_active %}
+                                <span class="badge bg-success">Active</span>
+                            {% else %}
+                                <span class="badge bg-danger">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'adminpanel:product_status_change' product.id %}" class="btn btn-sm btn-info">{% if product.is_active %}Disable{% else %}Enable{% endif %}</a>
+                            <a href="{% url 'adminpanel:product_update' product.id %}" class="btn btn-sm btn-primary">Edit</a>
+                            <a href="{% url 'adminpanel:product_delete' product.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this product?')">Delete</a>
+                        </td>
+                    </tr>   
                     {% endfor %}
                 </tbody>
             </table>

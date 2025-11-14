@@ -16,6 +16,7 @@
                         <th>Status</th>
                         <th>Date</th>
                         <th>Total</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -23,9 +24,37 @@
                     <tr>
                         <td>{{ order.id }}</td>
                         <td>{{ order.user.username }}</td>
-                        <td>{{ order.get_status_display }}</td>
+                        <td id="order-status-{{ order.id }}">{{ order.get_status_display }}</td>
                         <td>{{ order.created_at }}</td>
                         <td>₹{{ order.total_amount }}</td>
+                        <td>
+                            <select class="form-select" onchange="updateOrderStatus(this, {{ order.id }})">
+                                {% for status, label in order_status_choices %}
+                                <option value="{{ status }}" {% if order.status == status %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+
+                        <script>
+                            function updateOrderStatus(select, orderId) {
+                                const status = select.value;
+                                fetch(`{% url 'adminpanel:order_status_change' %}`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRFToken': '{{ csrf_token }}',
+                                    },
+                                    body: JSON.stringify({ order_id: orderId, status: status }),
+                                })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        document.getElementById(`order-status-${orderId}`).textContent = data.status;
+                                    })
+                                    .catch(error => {
+                                        console.error('Error:', error);
+                                    });
+                            }
+                        </script>
                     </tr>
                     {% endfor %}
                 </tbody>

@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.db.models import Avg
 from django.db import transaction
 from django.contrib.auth.decorators import login_required
+from django.db.models.functions import Random
 
 from shop.models import Product
 from users.models import Cart, CartItem
@@ -15,7 +16,15 @@ logger = logging.getLogger('shop')
 
 def index(request):
     logger.info(f"Index page accessed by {request.META.get('REMOTE_ADDR', 'unknown')}")
-    return render(request, 'shop/index.html')
+    new_arrivals = Product.objects.filter(is_active=True, is_deleted=False).order_by('-created_at')[:8]
+    trending_items = Product.objects.filter(is_active=True, is_deleted=False).annotate(avg_rating=Avg('ratings__rating')).order_by('-avg_rating')[:8]
+    special_for_you = Product.objects.filter(is_active=True, is_deleted=False).order_by(Random())[:8]
+    context = {
+        'new_arrivals': new_arrivals,
+        'trending_items': trending_items,
+        'special_for_you': special_for_you
+    }
+    return render(request, 'shop/index.html', context)
 
 
 def product_list(request):

@@ -5,12 +5,13 @@ from django.db.models import Sum, F, Subquery, OuterRef
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.db import transaction
+from django.contrib.auth.decorators import login_required
 
-from users.forms import AddressForm
 from orders.models import Order, OrderItem
 from shop.models import ProductRating
 
 
+@login_required(login_url='users:login')
 def checkout_view(request):
     cart_items = CartItem.objects.filter(cart__user=request.user).annotate(subtotal=F('quantity') * F('product__price'))
     total = cart_items.aggregate(total=Sum(F('subtotal')))['total']
@@ -74,6 +75,7 @@ def checkout_view(request):
     return render(request, 'orders/checkout.html', context)
 
 
+@login_required(login_url='users:login')
 def orders_view(request):
     orders = Order.objects.filter(user=request.user).select_related('address').prefetch_related(
         'orderitem_set', 'orderitem_set__product').order_by('-created_at')
@@ -83,6 +85,7 @@ def orders_view(request):
     return render(request, 'orders/orders.html', context)
 
 
+@login_required(login_url='users:login')
 def order_detail_view(request, order_id):
     order = Order.objects.get(id=order_id)
     user_rating_subquery = Subquery(

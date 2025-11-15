@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
 from django.db.models import Avg
 from django.db import transaction
+from django.contrib.auth.decorators import login_required
 
 from shop.models import Product
 from users.models import Cart, CartItem
@@ -51,6 +52,7 @@ def product_detail(request, product_id):
     return render(request, 'shop/product_detail.html', context)
 
 
+@login_required(login_url='users:login')
 def add_to_cart(request, product_id):
     try:
         product = Product.objects.get(id=product_id, is_active=True, is_deleted=False)
@@ -75,6 +77,7 @@ def add_to_cart(request, product_id):
         return redirect('shop:product_detail', product_id=product_id)
 
 
+@login_required(login_url='users:login')
 def rate_product(request, product_id):
     try:
         product = Product.objects.get(id=product_id, is_active=True, is_deleted=False)

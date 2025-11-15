@@ -30,6 +30,8 @@ def dashboard(request):
     return render(request, 'adminpanel/dashboard.html', context)
 
 
+@login_required(login_url='adminpanel:login')
+@user_passes_test(lambda user: user.is_staff, login_url='adminpanel:admin_404', redirect_field_name=None)
 def orders(request):
     orders = Order.objects.all()
     order_status_choices = [(status, label) for status, label in OrderStatus.choices]
@@ -40,6 +42,8 @@ def orders(request):
     return render(request, 'adminpanel/orders.html', context)
 
 
+@login_required(login_url='adminpanel:login')
+@user_passes_test(lambda user: user.is_staff, login_url='adminpanel:admin_404', redirect_field_name=None)
 def order_status_change(request):
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -55,6 +59,8 @@ def order_status_change(request):
     return JsonResponse({'message': 'Invalid request'}, status=400)
 
 
+@login_required(login_url='adminpanel:login')
+@user_passes_test(lambda user: user.is_staff, login_url='adminpanel:admin_404', redirect_field_name=None)
 def customers(request):
     customers = User.objects.filter(is_staff=False)
     context = {
@@ -63,6 +69,8 @@ def customers(request):
     return render(request, 'adminpanel/customers.html', context)
 
 
+@login_required(login_url='adminpanel:login')
+@user_passes_test(lambda user: user.is_staff, login_url='adminpanel:admin_404', redirect_field_name=None)
 def products(request):
     products = Product.objects.filter(is_deleted=False).annotate(avg_rating=Avg('ratings__rating'))
     context = {
@@ -71,6 +79,8 @@ def products(request):
     return render(request, 'adminpanel/products.html', context)
 
 
+@login_required(login_url='adminpanel:login')
+@user_passes_test(lambda user: user.is_staff, login_url='adminpanel:admin_404', redirect_field_name=None)
 def product_create(request):
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES)
@@ -86,6 +96,8 @@ def product_create(request):
     return render(request, 'adminpanel/product_create.html', {'form': form})
 
 
+@login_required(login_url='adminpanel:login')
+@user_passes_test(lambda user: user.is_staff, login_url='adminpanel:admin_404', redirect_field_name=None)
 def product_update(request, product_id):
     try:
         product = Product.objects.get(id=product_id, is_deleted=False)
@@ -106,6 +118,8 @@ def product_update(request, product_id):
         return render(request, 'adminpanel/product_create.html', {'form': form})
 
 
+@login_required(login_url='adminpanel:login')
+@user_passes_test(lambda user: user.is_staff, login_url='adminpanel:admin_404', redirect_field_name=None)
 def product_status_change(request, product_id):
     try:
         product = Product.objects.get(id=product_id, is_deleted=False)
@@ -118,6 +132,8 @@ def product_status_change(request, product_id):
     return redirect('adminpanel:products')
 
 
+@login_required(login_url='adminpanel:login')
+@user_passes_test(lambda user: user.is_staff, login_url='adminpanel:admin_404', redirect_field_name=None)
 def product_delete(request, product_id):
     try:
         product = Product.objects.get(id=product_id, is_deleted=False)
@@ -129,6 +145,7 @@ def product_delete(request, product_id):
     product.save()
     messages.success(request, 'Product deleted successfully')
     return redirect('adminpanel:products')
+
 
 def admin_404(request):
     return render(request, 'adminpanel/admin_404.html', status=404)

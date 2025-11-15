@@ -3,9 +3,11 @@ from django.shortcuts import redirect
 from django.contrib.auth import login, logout
 from django.db.models import F, Sum
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
 from users.forms import UserRegistrationForm, UserLoginForm
 from users.models import Cart, CartItem
+
 
 def user_registration(request):
     if request.method == 'POST':
@@ -31,15 +33,18 @@ def user_login(request):
         form = UserLoginForm(request)
     return render(request, 'users/login.html', {'form': form})
 
+
 def user_logout(request):
     logout(request)
     return redirect('shop:index')
 
 
+@login_required(login_url='users:login')
 def user_profile(request):
     pass
 
 
+@login_required(login_url='users:login')
 def cart_view(request):
     cart, created = Cart.objects.get_or_create(user=request.user)
     cart_items = CartItem.objects.filter(cart=cart).annotate(subtotal=F('quantity') * F('product__price'))
@@ -54,6 +59,7 @@ def cart_view(request):
     return render(request, 'users/cart.html', context)
 
 
+@login_required(login_url='users:login')
 def remove_from_cart(request, cart_item_id):
     cart_item = get_object_or_404(CartItem, id=cart_item_id)
     cart_item.delete()
@@ -61,6 +67,7 @@ def remove_from_cart(request, cart_item_id):
     return redirect('users:cart')
 
 
+@login_required(login_url='users:login')
 def decrease_cart_quantity(request, cart_item_id):
     cart_item = get_object_or_404(CartItem, id=cart_item_id)
     if cart_item.quantity > 1:
@@ -72,6 +79,7 @@ def decrease_cart_quantity(request, cart_item_id):
     return redirect('users:cart')
 
 
+@login_required(login_url='users:login')
 def increase_cart_quantity(request, cart_item_id):
     cart_item = get_object_or_404(CartItem, id=cart_item_id)
     if cart_item.quantity + 1 > cart_item.product.stock:

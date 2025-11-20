@@ -90,7 +90,7 @@ def checkout_view(request):
 @login_required(login_url='users:login')
 def orders_view(request):
     orders = Order.objects.filter(user=request.user).select_related('address').prefetch_related(
-        'orderitem_set', 'orderitem_set__product').order_by('-created_at')
+        'order_items', 'order_items__product').order_by('-created_at')
     logger.info(f"Orders list viewed: user={request.user.email}, count={orders.count()}")
     context = {
         'orders': orders

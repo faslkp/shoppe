@@ -43,6 +43,12 @@
                             </div>
                         {% else %}
                             <div class="alert alert-info mb-2 p-2">No saved addresses found. Please add a new shipping address below.</div>
+                            <label class="list-group-item list-group-item-action d-flex align-items-center" style="cursor:pointer;">
+                                <input class="form-check-input me-2" type="radio" name="selected_address" value="new" checked id="newAddressRadio" data-address-type="new">
+                                <div>
+                                    <strong>Add New Address</strong>
+                                </div>
+                            </label>
                         {% endif %}
 
                         <div id="newAddressForm" {% if addresses %} style="display:none;" {% endif %}>

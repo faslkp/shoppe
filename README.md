@@ -44,6 +44,8 @@ All Python dependencies are listed in `requirements.txt`.
    The storefront lives at `/`, Django admin at `/admin/`, and API routes under `/api/`.
 
 ## API 
-- `POST /api/register/` – open registration endpoint that mirrors the web form validation.
+- `POST /api/users/register/` – open registration endpoint that mirrors the web form validation.
+- `POST /api/users/login/` – login endpoint which return access and refresh tokens.
+- `POST /api/users/token/refresh/` – token refresh endpoint which accepts refresh token and return new access token.
 - `GET /api/products/` – anonymous product listing with average rating annotations.
 - `GET /api/orders/` – authenticated endpoint returning the requester’s orders; supports session or JWT auth.

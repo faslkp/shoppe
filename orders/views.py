@@ -62,6 +62,9 @@ def checkout_view(request):
                         cart_item.save()
                         raise Exception(f'Sorry, only {cart_item.product.stock} {cart_item.product.name}(s) left in stock.')
                     
+                    if not cart_item.product.is_active or cart_item.product.is_deleted:
+                        raise Exception(f'Product {cart_item.product.name} is no longer available.')
+                    
                     OrderItem.objects.create(order=order, product=cart_item.product, quantity=cart_item.quantity, price=cart_item.product.price)
 
                     cart_item.product.stock -= cart_item.quantity

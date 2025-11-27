@@ -16,9 +16,9 @@ logger = logging.getLogger('shop')
 
 def index(request):
     logger.info(f"Index page accessed by {request.META.get('REMOTE_ADDR', 'unknown')}")
-    new_arrivals = Product.objects.filter(is_active=True, is_deleted=False).order_by('-created_at')[:8]
-    trending_items = Product.objects.filter(is_active=True, is_deleted=False).annotate(avg_rating=Avg('ratings__rating')).order_by('-avg_rating')[:8]
-    special_for_you = Product.objects.filter(is_active=True, is_deleted=False).order_by(Random())[:8]
+    new_arrivals = Product.objects.filter(is_active=True, is_deleted=False).order_by('-created_at')[:5]
+    trending_items = Product.objects.filter(is_active=True, is_deleted=False).annotate(avg_rating=Avg('ratings__rating')).order_by('-avg_rating')[:5]
+    special_for_you = Product.objects.filter(is_active=True, is_deleted=False).order_by(Random())[:5]
     context = {
         'new_arrivals': new_arrivals,
         'trending_items': trending_items,
